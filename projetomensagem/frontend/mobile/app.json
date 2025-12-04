@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Chat Delivery",
+    "slug": "chat-delivery",
+    "version": "1.0.0",
+    "platforms": ["ios", "android", "web"],
+    "sdkVersion": "48.0.0",
+    "orientation": "portrait",
+    "updates": {"fallbackToCacheTimeout": 0},
+    "assetBundlePatterns": ["**/*"],
+    "android": {
+      "googleServicesFile": "./google-services.json",
+      "useNextNotificationsApi": true
+    }
+  }
+}

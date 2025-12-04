@@ -1,72 +1,74 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   FlatList,
-  StyleSheet
+  StyleSheet,
 } from "react-native";
 
-export default function ChatScreen() {
-  const [user, setUser] = useState("Khemily");
-  const [toSend, setToSend] = useState("");
+export default function ChatScreen({ route }) {
+  const { agent, userName } = route.params;
+
   const [msg, setMsg] = useState("");
-  const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState([]);
 
   const socketRef = useRef(null);
 
-  const openConnection = () => {
-    if (!user.trim()) {
-      alert("Digite o nome de usuário!");
-      return;
-    }
-
+  useEffect(() => {
     const socket = new WebSocket("ws://localhost:8080");
     socketRef.current = socket;
 
     socket.onopen = () => {
-      setConnected(true);
-      socket.send("@+" + user);
+      socket.send("@+" + userName);
     };
 
-    socket.onclose = () => setConnected(false);
-
-    socket.onerror = (err) => alert("Erro: " + err.message);
-
-    socket.onmessage = (msg) => {
-      setMessages((prev) => [...prev, { self: false, text: msg.data }]);
+    socket.onmessage = (event) => {
+      setMessages((prev) => [
+        ...prev,
+        { self: false, text: event.data },
+      ]);
     };
-  };
 
-  const sendMessage = () => {
-    if (!msg.trim() || !toSend.trim() || !socketRef.current) return;
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.send("@-" + userName);
+        socketRef.current.close();
+      }
+    };
+  }, []);
 
-    const obj = { to: toSend, from: user, msg: msg };
+  function sendMessage() {
+    if (!msg.trim()) return;
+
+    const obj = {
+      to: agent.name,
+      from: userName,
+      msg: msg,
+    };
 
     socketRef.current.send("!" + JSON.stringify(obj));
 
     setMessages((prev) => [...prev, { self: true, text: msg }]);
+
     setMsg("");
-  };
+  }
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>{toSend || "Chat"}</Text>
+        <Text style={styles.headerText}>{agent.name}</Text>
       </View>
 
-      {/* Chat Messages */}
       <FlatList
         data={messages}
-        keyExtractor={(_, index) => index.toString()}
+        keyExtractor={(_, i) => i.toString()}
         renderItem={({ item }) => (
           <View
             style={[
               styles.bubble,
-              item.self ? styles.bubbleSelf : styles.bubbleOther
+              item.self ? styles.bubbleSelf : styles.bubbleOther,
             ]}
           >
             <Text style={item.self ? styles.textSelf : styles.textOther}>
@@ -77,79 +79,54 @@ export default function ChatScreen() {
         contentContainerStyle={{ padding: 10 }}
       />
 
-      {/* Input */}
-      <View style={styles.inputContainer}>
+      <View style={styles.inputArea}>
         <TextInput
-          placeholder="Mensagem"
+          style={styles.input}
+          placeholder="Digite sua mensagem..."
           value={msg}
           onChangeText={setMsg}
-          style={styles.input}
         />
 
-        <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
-          <Text style={{ color: "white", fontWeight: "bold" }}>Enviar</Text>
+        <TouchableOpacity style={styles.btn} onPress={sendMessage}>
+          <Text style={styles.btnText}>Enviar</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-// -------------------------------------------
-// STYLES – Estilo WhatsApp
-// -------------------------------------------
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#ECE5DD",
-  },
-  header: {
-    backgroundColor: "#075E54",
-    padding: 15,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  headerTitle: {
-    color: "white",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
+  container: { flex: 1, backgroundColor: "#ECE5DD" },
+  header: { padding: 15, backgroundColor: "#075E54" },
+  headerText: { color: "white", fontSize: 18, fontWeight: "bold" },
   bubble: {
+    maxWidth: "75%",
     padding: 10,
     borderRadius: 10,
     marginVertical: 5,
-    maxWidth: "75%",
   },
-  bubbleSelf: {
-    backgroundColor: "#DCF8C6",
-    alignSelf: "flex-end",
-  },
-  bubbleOther: {
-    backgroundColor: "white",
-    alignSelf: "flex-start",
-  },
-  textSelf: {
-    color: "#000",
-  },
-  textOther: {
-    color: "#000",
-  },
-  inputContainer: {
+  bubbleSelf: { backgroundColor: "#DCF8C6", alignSelf: "flex-end" },
+  bubbleOther: { backgroundColor: "white", alignSelf: "flex-start" },
+  textSelf: { color: "#000" },
+  textOther: { color: "#000" },
+  inputArea: {
     flexDirection: "row",
     padding: 10,
     backgroundColor: "#fff",
-    alignItems: "center",
   },
   input: {
     flex: 1,
-    backgroundColor: "#EEE",
+    backgroundColor: "#eee",
     borderRadius: 20,
     paddingHorizontal: 15,
     paddingVertical: 10,
   },
-  sendButton: {
+  btn: {
     backgroundColor: "#075E54",
-    padding: 12,
-    borderRadius: 30,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 20,
     marginLeft: 10,
   },
+  btnText: { color: "#fff", fontWeight: "bold" },
 });

@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-const DUMMY_AGENTS = [
-  { id: '1', name: 'Login' },
-];
+export default function AgentsListScreen({ route, navigation }) {
+  const { userName } = route.params;
 
-export default function AgentsListScreen({ navigation, route }) {
-  const { userName } = route.params || {};
+  const agents = [
+    { id: '1', name: 'Suporte 01' },
+    { id: '2', name: 'Suporte 02' },
+  ];
 
   function openChat(agent) {
     navigation.navigate('Chat', { agent, userName });
@@ -14,22 +15,37 @@ export default function AgentsListScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Atendentes disponíveis</Text>
-      <FlatList
-        data={DUMMY_AGENTS}
-        keyExtractor={(i) => i.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.item} onPress={() => openChat(item)}>
-            <Text>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-      />
+      <Text style={styles.title}>Escolha um atendente</Text>
+
+      {agents.map(a => (
+        <TouchableOpacity
+          key={a.id}
+          style={styles.item}
+          onPress={() => openChat(a)}
+        >
+          <Text style={styles.itemText}>{a.name}</Text>
+        </TouchableOpacity>
+      ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  header: { fontSize: 18, marginBottom: 8 },
-  item: { padding: 12, borderBottomWidth: 1, borderBottomColor: '#000000ff' },
+  container: {
+    flex: 1,
+    padding: 20
+  },
+  title: {
+    fontSize: 22,
+    marginBottom: 20
+  },
+  item: {
+    padding: 15,
+    backgroundColor: '#eee',
+    marginBottom: 10,
+    borderRadius: 10
+  },
+  itemText: {
+    fontSize: 18
+  }
 });

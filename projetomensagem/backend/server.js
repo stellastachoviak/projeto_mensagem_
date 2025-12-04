@@ -1,4 +1,4 @@
-require('dotenv').config();
+const dotenv = require ('dotenv');
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -6,6 +6,7 @@ const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+dotenv.config();
 
 const app = express();
 const server = http.createServer(app);

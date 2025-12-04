@@ -31,5 +31,5 @@ export default function AgentsListScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   header: { fontSize: 18, marginBottom: 8 },
-  item: { padding: 12, borderBottomWidth: 1, borderBottomColor: '#eee' },
+  item: { padding: 12, borderBottomWidth: 1, borderBottomColor: '#000000ff' },
 });

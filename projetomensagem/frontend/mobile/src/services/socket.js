@@ -66,7 +66,7 @@ wss.on("connection", (socket) => {
         for (let u in users) {
             if (users[u] === socket) {
                 delete users[u];
-                console.log("🔻 Usuário desconectou:", u);
+                console.log(" Usuário desconectou:", u);
                 break;
             }
         }

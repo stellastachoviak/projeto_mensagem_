@@ -8,7 +8,7 @@ console.log(" Servidor WebSocket rodando na porta 8080...");
 let users = {}; // { username: socket }
 
 wss.on("connection", (socket) => {
-    console.log("🔌 Novo cliente conectado.");
+    console.log("Novo cliente conectado.");
 
     socket.on("message", (data) => {
         const msg = data.toString();
